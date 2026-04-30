@@ -1,25 +1,27 @@
 import React from 'react';
 
-const ProgressCard = ({ title, value, max, icon: Icon, color }) => {
-  const percentage = (value / max) * 100;
+const ProgressCard = ({ title, value, max, icon: Icon, colorClass }) => {
+  const percentage = max > 0 ? Math.min(100, (value / max) * 100) : 0;
 
   return (
-    <div className="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-xl p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-slate-400 text-sm font-medium">{title}</h3>
-        <div className={`bg-gradient-to-br ${color} p-3 rounded-lg`}>
-          <Icon size={20} className="text-white" />
+    <div className="glass-card rounded-2xl p-6 flex flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <p className="type-label text-slate-500">{title}</p>
+        <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${colorClass}`}>
+          <Icon size={18} className="text-white" />
         </div>
       </div>
-      <div className="mb-2">
-        <span className="text-3xl font-bold text-white">{value}</span>
-        <span className="text-slate-400 text-sm">/ {max}</span>
+      <div>
+        <span className="type-metric text-white">{value}</span>
+        <span className="text-slate-500 text-sm ml-1">/ {max}</span>
       </div>
-      <div className="w-full bg-slate-700 rounded-full h-2 overflow-hidden">
-        <div
-          className={`${color} h-2 rounded-full transition-all duration-500`}
-          style={{ width: `${percentage}%` }}
-        />
+      <div>
+        <div className="flex items-center justify-between mb-1.5">
+          <span className="text-xs text-slate-500">{Math.round(percentage)}% সম্পূর্ণ</span>
+        </div>
+        <div className="progress-bar h-2">
+          <div className="progress-bar-fill" style={{ width: `${percentage}%` }} />
+        </div>
       </div>
     </div>
   );

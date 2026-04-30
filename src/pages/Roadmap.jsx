@@ -1,201 +1,233 @@
 import React, { useState } from 'react';
-import { Filter, Plus, CheckCircle2, Circle, Clock } from 'lucide-react';
+import {
+  Filter, CheckCircle2, Circle, Clock, ChevronDown,
+  ExternalLink, Play, Flag,
+} from 'lucide-react';
 import useStore from '../store/store';
+
+const phaseColors = {
+  1: { badge: 'badge-blue',   bar: '#3b82f6', dot: '#3b82f6',  label: 'সেটআপ' },
+  2: { badge: 'badge-violet', bar: '#8b5cf6', dot: '#8b5cf6',  label: 'কোর ডেভেলপমেন্ট' },
+  3: { badge: 'badge-green',  bar: '#10b981', dot: '#10b981',  label: 'Advanced Features' },
+  4: { badge: 'badge-amber',  bar: '#f59e0b', dot: '#f59e0b',  label: 'Deployment' },
+};
+
+const statusConfig = {
+  pending:     { icon: Circle,       label: 'অপেক্ষমাণ', badgeClass: 'badge-slate' },
+  'in-progress': { icon: Clock,       label: 'চলমান',     badgeClass: 'badge-amber' },
+  completed:   { icon: CheckCircle2, label: 'সম্পূর্ণ',  badgeClass: 'badge-green' },
+};
 
 const Roadmap = () => {
   const { roadmapTasks, updateTaskStatus, updateTaskProgress } = useStore();
   const [selectedPhase, setSelectedPhase] = useState('all');
   const [expandedTask, setExpandedTask] = useState(null);
 
-  const phases = [
-    { id: 1, name: 'ফেজ ১: সেটআপ', color: 'blue' },
-    { id: 2, name: 'ফেজ २: কোর ডেভেলপমেন্ট', color: 'purple' },
-    { id: 3, name: 'ফেজ ३: Advanced Features', color: 'green' },
-    { id: 4, name: 'ফেজ ४: Deployment', color: 'orange' },
-  ];
+  const phases = [1, 2, 3, 4];
 
   const filteredTasks = selectedPhase === 'all'
     ? roadmapTasks
-    : roadmapTasks.filter(task => task.phase === parseInt(selectedPhase));
-
-  const getStatusBadge = (status) => {
-    const badges = {
-      pending: { bg: 'bg-slate-600', text: 'অপেক্ষমাণ', icon: Circle },
-      'in-progress': { bg: 'bg-yellow-600', text: 'চলমান', icon: Clock },
-      completed: { bg: 'bg-green-600', text: 'সম্পূর্ণ', icon: CheckCircle2 },
-    };
-    const badge = badges[status];
-    const Icon = badge.icon;
-    return (
-      <span className={`flex items-center space-x-1 px-3 py-1 rounded-full text-sm font-semibold ${badge.bg} text-white`}>
-        <Icon size={16} />
-        <span>{badge.text}</span>
-      </span>
-    );
-  };
+    : roadmapTasks.filter((t) => t.phase === parseInt(selectedPhase));
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-slate-800 to-slate-900 border border-slate-700 rounded-2xl p-8">
-        <h1 className="text-4xl font-bold text-white mb-2">পর্যায়ক্রমিক রোডম্যাপ</h1>
-        <p className="text-slate-400">আপনার Personal AI সিস্টেম তৈরির সম্পূর্ণ পরিকল্পনা</p>
-      </div>
+    <div className="space-y-8 max-w-5xl">
 
-      {/* Filter */}
-      <div className="flex items-center space-x-4 bg-slate-800 border border-slate-700 rounded-xl p-4">
-        <Filter size={20} className="text-slate-400" />
-        <div className="space-x-2 flex flex-wrap">
-          <button
-            onClick={() => setSelectedPhase('all')}
-            className={`px-4 py-2 rounded-lg font-semibold transition-all ${
-              selectedPhase === 'all'
-                ? 'bg-blue-600 text-white'
-                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-            }`}
-          >
-            সব ফেজ
-          </button>
-          {phases.map((phase) => (
-            <button
-              key={phase.id}
-              onClick={() => setSelectedPhase(phase.id.toString())}
-              className={`px-4 py-2 rounded-lg font-semibold transition-all ${
-                selectedPhase === phase.id.toString()
-                  ? `bg-${phase.color}-600 text-white`
-                  : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-              }`}
-            >
-              ফেজ {phase.id}
-            </button>
-          ))}
+      {/* ── Header ─────────────────────────────────────────── */}
+      <div
+        className="relative rounded-3xl p-8 overflow-hidden"
+        style={{
+          background: 'linear-gradient(135deg, rgba(30,64,175,0.5) 0%, rgba(76,29,149,0.4) 100%)',
+          border: '1px solid rgba(59,130,246,0.2)',
+        }}
+      >
+        <div
+          className="absolute top-0 right-0 w-48 h-48 rounded-full pointer-events-none"
+          style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.15) 0%, transparent 70%)', transform: 'translate(20%, -30%)' }}
+        />
+        <div className="relative">
+          <p className="type-label text-blue-300/70 mb-2">পরিকল্পনা</p>
+          <h1 className="type-h1 text-white mb-2">পর্যায়ক্রমিক রোডম্যাপ</h1>
+          <p className="text-slate-400">আপনার Personal AI সিস্টেম তৈরির সম্পূর্ণ পরিকল্পনা</p>
         </div>
       </div>
 
-      {/* Timeline */}
+      {/* ── Phase Filters ────────────────────────────────────── */}
+      <div
+        className="flex flex-wrap gap-2 items-center p-4 rounded-2xl"
+        style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)' }}
+      >
+        <Filter size={15} className="text-slate-500 mr-1" />
+        {['all', ...phases.map(String)].map((val) => {
+          const isActive = selectedPhase === val;
+          const pc = phaseColors[parseInt(val)];
+          return (
+            <button
+              key={val}
+              onClick={() => setSelectedPhase(val)}
+              className="px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200"
+              style={isActive
+                ? { background: 'linear-gradient(135deg,#3b82f6,#8b5cf6)', color: '#fff', boxShadow: '0 0 12px rgba(59,130,246,0.3)' }
+                : { background: 'rgba(255,255,255,0.05)', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.08)' }
+              }
+            >
+              {val === 'all' ? 'সব ফেজ' : `ফেজ ${val}`}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* ── Task List ────────────────────────────────────────── */}
       <div className="space-y-4">
         {filteredTasks.length === 0 ? (
-          <div className="bg-slate-800 border border-slate-700 rounded-xl p-8 text-center">
-            <p className="text-slate-400 text-lg">এই ফেজে কোন কাজ নেই</p>
+          <div
+            className="rounded-2xl p-12 text-center"
+            style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)' }}
+          >
+            <Flag size={32} className="text-slate-600 mx-auto mb-3" />
+            <p className="text-slate-400 text-base">এই ফেজে কোনো কাজ নেই</p>
           </div>
         ) : (
-          filteredTasks.map((task, index) => {
-            const completedItems = task.checklist.filter(item => item.completed).length;
+          filteredTasks.map((task) => {
+            const completedItems = task.checklist.filter((i) => i.completed).length;
             const progress = Math.round((completedItems / task.checklist.length) * 100);
             const isExpanded = expandedTask === task.id;
+            const sc = statusConfig[task.status] || statusConfig.pending;
+            const StatusIcon = sc.icon;
+            const pc = phaseColors[task.phase] || phaseColors[1];
 
             return (
               <div
                 key={task.id}
-                className="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-xl overflow-hidden hover:border-slate-600 transition-all duration-300"
+                className="rounded-2xl overflow-hidden transition-all duration-300"
+                style={{
+                  background: 'rgba(255,255,255,0.02)',
+                  border: isExpanded
+                    ? '1px solid rgba(59,130,246,0.25)'
+                    : '1px solid rgba(255,255,255,0.07)',
+                  boxShadow: isExpanded ? '0 0 24px rgba(59,130,246,0.08)' : 'none',
+                }}
               >
                 {/* Task Header */}
                 <button
                   onClick={() => setExpandedTask(isExpanded ? null : task.id)}
-                  className="w-full p-6 flex items-start justify-between hover:bg-slate-700 hover:bg-opacity-50 transition-colors"
+                  className="w-full p-5 flex items-start gap-4 hover:bg-white/[0.02] transition-colors text-left"
                 >
-                  <div className="flex items-start space-x-4 flex-1 text-left">
-                    <div className="mt-1">
-                      {task.status === 'completed' ? (
-                        <CheckCircle2 size={24} className="text-green-400" />
-                      ) : task.status === 'in-progress' ? (
-                        <Clock size={24} className="text-yellow-400 animate-pulse" />
-                      ) : (
-                        <Circle size={24} className="text-slate-500" />
+                  {/* Status icon */}
+                  <StatusIcon
+                    size={20}
+                    className={`flex-shrink-0 mt-0.5 ${
+                      task.status === 'completed'   ? 'text-emerald-400' :
+                      task.status === 'in-progress' ? 'text-amber-400 animate-pulse' :
+                      'text-slate-600'
+                    }`}
+                  />
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                      <h3 className="type-h3 text-white">{task.title}</h3>
+                      <span className={`badge ${sc.badgeClass}`}>{sc.label}</span>
+                      <span className={`badge ${pc.badge}`}>ফেজ {task.phase}</span>
+                      {task.priority === 'high' && (
+                        <span className="badge badge-red">উচ্চ প্রাধান্য</span>
                       )}
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <h3 className="text-xl font-bold text-white">{task.title}</h3>
-                        {getStatusBadge(task.status)}
-                      </div>
-                      <p className="text-slate-400 text-sm mb-3">{task.description}</p>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-slate-500">{completedItems}/{task.checklist.length} সম্পূর্ণ</span>
-                        <div className="w-32 bg-slate-700 rounded-full h-2">
+                    <p className="text-sm text-slate-500 mb-3">{task.description}</p>
+                    <div className="flex items-center gap-4">
+                      <div className="flex-1 max-w-xs">
+                        <div className="progress-bar h-1.5">
                           <div
-                            className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all"
-                            style={{ width: `${progress}%` }}
+                            className="progress-bar-fill"
+                            style={{ width: `${progress}%`, background: `linear-gradient(90deg, ${pc.bar}, #8b5cf6)` }}
                           />
                         </div>
                       </div>
+                      <span className="text-xs text-slate-500 tabular-nums">{completedItems}/{task.checklist.length}</span>
                     </div>
                   </div>
-                  <div className={`transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
-                    <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                    </svg>
-                  </div>
+
+                  <ChevronDown
+                    size={16}
+                    className={`flex-shrink-0 text-slate-500 transition-transform duration-300 mt-1 ${isExpanded ? 'rotate-180' : ''}`}
+                  />
                 </button>
 
-                {/* Task Details */}
+                {/* Expanded details */}
                 {isExpanded && (
-                  <div className="border-t border-slate-700 p-6 bg-slate-900 bg-opacity-50">
-                    <div className="space-y-4">
-                      {/* Checklist */}
-                      <div>
-                        <h4 className="text-white font-bold mb-3">চেকলিস্ট</h4>
-                        <div className="space-y-2">
-                          {task.checklist.map((item) => (
-                            <button
-                              key={item.id}
-                              onClick={() => updateTaskProgress(task.id, item.id)}
-                              className="w-full flex items-center space-x-3 p-2 rounded-lg hover:bg-slate-700 transition-colors text-left"
-                            >
-                              <div className={`flex-shrink-0 ${item.completed ? 'text-green-400' : 'text-slate-500'}`}>
-                                {item.completed ? (
-                                  <CheckCircle2 size={20} />
-                                ) : (
-                                  <Circle size={20} />
-                                )}
-                              </div>
-                              <span className={`${item.completed ? 'line-through text-slate-500' : 'text-white'}`}>
-                                {item.text}
-                              </span>
-                            </button>
-                          ))}
-                        </div>
+                  <div
+                    className="border-t p-6 space-y-5"
+                    style={{ borderColor: 'rgba(255,255,255,0.07)', background: 'rgba(0,0,0,0.25)' }}
+                  >
+                    {/* Checklist */}
+                    <div>
+                      <p className="type-label text-slate-500 mb-3">চেকলিস্ট</p>
+                      <div className="space-y-2">
+                        {task.checklist.map((item) => (
+                          <button
+                            key={item.id}
+                            onClick={() => updateTaskProgress(task.id, item.id)}
+                            className="w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all duration-200"
+                            style={{
+                              background: item.completed ? 'rgba(16,185,129,0.06)' : 'rgba(255,255,255,0.03)',
+                              border: item.completed ? '1px solid rgba(16,185,129,0.2)' : '1px solid rgba(255,255,255,0.06)',
+                            }}
+                          >
+                            {item.completed
+                              ? <CheckCircle2 size={18} className="text-emerald-400 flex-shrink-0" />
+                              : <Circle size={18} className="text-slate-600 flex-shrink-0" />
+                            }
+                            <span className={`text-sm ${item.completed ? 'line-through text-slate-500' : 'text-slate-200'}`}>
+                              {item.text}
+                            </span>
+                          </button>
+                        ))}
                       </div>
+                    </div>
 
-                      {/* Resources */}
-                      <div>
-                        <h4 className="text-white font-bold mb-3">সংস্থান</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {task.resources.map((resource, idx) => (
-                            <a
-                              key={idx}
-                              href="#"
-                              className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm transition-colors"
-                            >
-                              {resource}
-                            </a>
-                          ))}
-                        </div>
+                    {/* Resources */}
+                    <div>
+                      <p className="type-label text-slate-500 mb-3">সংস্থান</p>
+                      <div className="flex flex-wrap gap-2">
+                        {task.resources.map((resource, idx) => (
+                          <a
+                            key={idx}
+                            href="#"
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200"
+                            style={{ background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.2)', color: '#93c5fd' }}
+                            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(59,130,246,0.18)'; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(59,130,246,0.1)'; }}
+                          >
+                            <ExternalLink size={13} />
+                            {resource}
+                          </a>
+                        ))}
                       </div>
+                    </div>
 
-                      {/* Action Buttons */}
-                      <div className="flex space-x-2 pt-4">
-                        {task.status !== 'completed' && (
-                          <>
-                            {task.status === 'pending' && (
-                              <button
-                                onClick={() => updateTaskStatus(task.id, 'in-progress')}
-                                className="px-4 py-2 bg-yellow-600 hover:bg-yellow-500 text-white rounded-lg font-semibold transition-colors"
-                              >
-                                শুরু করুন
-                              </button>
-                            )}
-                            {task.status === 'in-progress' && (
-                              <button
-                                onClick={() => updateTaskStatus(task.id, 'completed')}
-                                className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg font-semibold transition-colors"
-                              >
-                                সম্পূর্ণ করুন
-                              </button>
-                            )}
-                          </>
-                        )}
-                      </div>
+                    {/* Action buttons */}
+                    <div className="flex gap-3 pt-1">
+                      {task.status === 'pending' && (
+                        <button
+                          onClick={() => updateTaskStatus(task.id, 'in-progress')}
+                          className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-semibold transition-all duration-200"
+                          style={{ background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.25)', color: '#fcd34d' }}
+                        >
+                          <Play size={14} /> শুরু করুন
+                        </button>
+                      )}
+                      {task.status === 'in-progress' && (
+                        <button
+                          onClick={() => updateTaskStatus(task.id, 'completed')}
+                          className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-semibold transition-all duration-200"
+                          style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.25)', color: '#6ee7b7' }}
+                        >
+                          <CheckCircle2 size={14} /> সম্পূর্ণ করুন
+                        </button>
+                      )}
+                      {task.status === 'completed' && (
+                        <span className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-semibold badge-green badge">
+                          <CheckCircle2 size={14} /> সম্পূর্ণ হয়েছে
+                        </span>
+                      )}
                     </div>
                   </div>
                 )}

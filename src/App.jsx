@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { BookOpen, Zap, Target, Users, TrendingUp, Settings } from 'lucide-react';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
 import Roadmap from './pages/Roadmap';
@@ -14,27 +13,32 @@ function App() {
 
   const pages = {
     dashboard: <Dashboard />,
-    roadmap: <Roadmap />,
-    tracker: <KnowledgeTracker />,
-    courses: <CourseLibrary />,
+    roadmap:   <Roadmap />,
+    tracker:   <KnowledgeTracker />,
+    courses:   <CourseLibrary />,
     analytics: <Analytics />,
-    settings: <Settings />,
+    settings:  <Settings />,
   };
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="flex h-screen overflow-hidden" style={{ background: '#030712' }}>
+      {/* Ambient background blobs */}
+      <div className="ambient-bg" />
+
       {/* Sidebar */}
-      <Sidebar 
-        currentPage={currentPage} 
+      <Sidebar
+        currentPage={currentPage}
         setCurrentPage={setCurrentPage}
         isOpen={sidebarOpen}
         setIsOpen={setSidebarOpen}
       />
 
       {/* Main Content */}
-      <main className={`flex-1 overflow-auto transition-all duration-300 ${sidebarOpen ? 'ml-0' : 'ml-0'}`}>
-        <div className="p-6 md:p-8">
-          {pages[currentPage]}
+      <main className="relative flex-1 overflow-y-auto z-10">
+        <div className="p-6 md:p-8 min-h-full" key={currentPage}>
+          <div className="page-enter">
+            {pages[currentPage]}
+          </div>
         </div>
       </main>
     </div>
